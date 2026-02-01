@@ -4,6 +4,15 @@ import "dotenv/config"
 const app = express();
 const port = process.env.PORT || 4000;
 
+
+// Allow multiple origins
+
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",
+];
+
+
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
