@@ -7,6 +7,7 @@ import collegeRouter from "./routes/collegeRoute.js";
 import itemRouter from "./routes/itemRoute.js";
 import connectDB from "./configs/db.js";
 import connectCloudinary from "./configs/cloudinary.js";
+import wishlistRouter from "./routes/wishlistRoute.js";
 
 
 const app = express();
@@ -39,6 +40,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter)
 app.use("/api/college", collegeRouter)
 app.use("/api/item", itemRouter)
+app.use("/api/wishlist", wishlistRouter)
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
