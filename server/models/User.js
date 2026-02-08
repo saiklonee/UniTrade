@@ -13,7 +13,15 @@ const userSchema = new mongoose.Schema(
         },
 
         name: { type: String, required: true, trim: true },
-        email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
+        },
+
         mobile: { type: String, required: true, unique: true, trim: true },
 
         role: {
@@ -23,8 +31,8 @@ const userSchema = new mongoose.Schema(
             default: "student",
         },
 
-        // ✅ Cloudinary URL only
-        avatarUrl: { type: String, trim: true },
+        // ✅ Store ONLY the Cloudinary URL (your frontend will upload first, then send url here)
+        avatarUrl: { type: String, trim: true, default: "" },
 
         permanentCollege: {
             type: mongoose.Schema.Types.ObjectId,
@@ -38,7 +46,8 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
 
-        password: { type: String, required: true },
+        // hashed password
+        password: { type: String, required: true, select: false },
 
         isBlocked: { type: Boolean, default: false },
         lastLoginAt: { type: Date },
@@ -50,5 +59,4 @@ userSchema.index({ currentCollege: 1 });
 userSchema.index({ role: 1 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
-
 export default User;
