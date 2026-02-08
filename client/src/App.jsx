@@ -9,6 +9,12 @@ import Landing from "./pages/Landing";
 import AddItem from "./pages/AddItem";
 
 import { checkAuth } from "./redux/features/auth/authSlice";
+import PublicLayout from "./layout/PublicLayout";
+import ProfileLayout from "./layout/ProfileLayout";
+import EditProfile from "./pages/profile/EditProfile";
+import ManageItems from "./pages/profile/ManageItems";
+import AddItemPage from "./pages/profile/AddItemPage";
+import Wishlist from "./pages/Wishlist";
 
 // Simple loader (replace with your component if you have one)
 const BootLoader = ({ label = "Booting UniTrade..." }) => (
@@ -60,10 +66,27 @@ const App = () => {
         path="/home"
         element={
           <Protected user={user}>
-            <Home />
+            <PublicLayout />
           </Protected>
         }
-      />
+      >
+        <Route index element={<Home />} />
+        <Route path="wishlist" element={<Wishlist />} />
+      </Route>
+
+      <Route
+        path="/profile"
+        element={
+          <Protected user={user}>
+            <ProfileLayout />
+          </Protected>
+        }
+      >
+        <Route index element={<EditProfile />} />
+        <Route path="add-item" element={<AddItemPage />} />
+        <Route path="manage-items" element={<ManageItems />} />
+        {/* <Route path="wishlist" element={<WishlistPage />} /> */}
+      </Route>
 
       <Route
         path="/add-item"
