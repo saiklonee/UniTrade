@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -15,10 +14,11 @@ const userSchema = new mongoose.Schema(
 
         name: { type: String, required: true, trim: true },
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-        mobile: { type: String, trim: true },
+        mobile: { type: String, required: true, unique: true, trim: true },
 
         role: {
             type: String,
+            required: true,
             enum: ["student", "faculty", "admin"],
             default: "student",
         },

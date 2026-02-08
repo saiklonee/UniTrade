@@ -1,12 +1,5 @@
+// models/Item.js
 import mongoose from "mongoose";
-
-const cloudinaryAssetSchema = new mongoose.Schema(
-    {
-        public_id: { type: String, required: true },
-        url: { type: String, required: true },
-    },
-    { _id: false }
-);
 
 const itemSchema = new mongoose.Schema(
     {
@@ -15,7 +8,17 @@ const itemSchema = new mongoose.Schema(
 
         category: {
             type: String,
-            enum: ["books", "electronics", "furniture", "notes", "sports", "cycles", "stationery", "hostel", "other"],
+            enum: [
+                "books",
+                "electronics",
+                "furniture",
+                "notes",
+                "sports",
+                "cycles",
+                "stationery",
+                "hostel",
+                "other",
+            ],
             default: "other",
         },
 
@@ -25,28 +28,41 @@ const itemSchema = new mongoose.Schema(
             default: "good",
         },
 
-        // Cloudinary only for storing item images
-        images: { type: [cloudinaryAssetSchema], default: [] },
+        // ✅ Cloudinary URLs only
+        imageUrls: {
+            type: [String],
+            default: [],
+        },
 
-        seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        seller: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
 
-        // IMPORTANT: which college feed it belongs to
-        college: { type: mongoose.Schema.Types.ObjectId, ref: "College", required: true },
+        // Which college feed this item belongs to
+        college: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "College",
+            required: true,
+        },
 
-        // Sell or Rent
-        listingType: { type: String, enum: ["sell", "rent"], required: true },
+        listingType: {
+            type: String,
+            enum: ["sell", "rent"],
+            required: true,
+        },
 
-        // pricing (sell)
+        // Sell
         price: { type: Number, min: 0 },
 
-        // pricing (rent)
+        // Rent
         rentPrice: { type: Number, min: 0 },
         rentUnit: { type: String, enum: ["day", "week", "month"] },
         securityDeposit: { type: Number, min: 0, default: 0 },
 
-        // Core visibility: if sold outside or inside -> make inactive
+        // ⭐ Core logic
         isActive: { type: Boolean, default: true },
-
         status: {
             type: String,
             enum: ["available", "sold", "rented_out"],
@@ -54,14 +70,11 @@ const itemSchema = new mongoose.Schema(
         },
 
         views: { type: Number, default: 0 },
-
-        // Optional helpers for UI
         tags: { type: [String], default: [] },
     },
     { timestamps: true }
 );
 
-// Feed performance
 itemSchema.index({ college: 1, isActive: 1, createdAt: -1 });
 itemSchema.index({ seller: 1, isActive: 1, createdAt: -1 });
 itemSchema.index({ title: "text", description: "text", tags: "text" });
