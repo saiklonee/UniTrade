@@ -1,22 +1,95 @@
-import { Routes, Route } from "react-router";
+import { Routes, Route, Navigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+
 import Home from "./pages/Home";
 import CollegeApiTestPage from "./pages/AddCollege";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import AddItem from "./pages/AddItem";
 
-const App = () => {
-  return (
-    <div>
-      <Routes>
-        <Route path="/landing" element={<Landing />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/college" element={<CollegeApiTestPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/add-item" element={<AddItem />} />
-      </Routes>
-    </div>
-  )
-}
+import { checkAuth } from "./redux/features/auth/authSlice";
 
-export default App
+// Simple loader (replace with your component if you have one)
+const BootLoader = ({ label = "Booting UniTrade..." }) => (
+  <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+    <div className="text-center">
+      <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-slate-300">{label}</p>
+    </div>
+  </div>
+);
+
+// Protected wrapper
+const Protected = ({ user, children }) => {
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+};
+
+const App = () => {
+  const dispatch = useDispatch();
+  const { booting, user } = useSelector((s) => s.auth);
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  // While checking auth, don't render routes to avoid flicker
+  if (booting) return <BootLoader />;
+
+  return (
+    <Routes>
+      {/* Root route logic */}
+      <Route
+        path="/"
+        element={user ? <Navigate to="/home" replace /> : <Landing />}
+      />
+
+      {/* Auth pages */}
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/home" replace /> : <Login />}
+      />
+      <Route
+        path="/landing"
+        element={user ? <Navigate to="/home" replace /> : <Landing />}
+      />
+
+      {/* Protected routes */}
+      <Route
+        path="/home"
+        element={
+          <Protected user={user}>
+            <Home />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/add-item"
+        element={
+          <Protected user={user}>
+            <AddItem />
+          </Protected>
+        }
+      />
+
+      <Route
+        path="/college"
+        element={
+          <Protected user={user}>
+            <CollegeApiTestPage />
+          </Protected>
+        }
+      />
+
+      {/* 404 */}
+      <Route
+        path="*"
+        element={<Navigate to={user ? "/home" : "/"} replace />}
+      />
+    </Routes>
+  );
+};
+
+export default App;
