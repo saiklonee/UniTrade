@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
 
-        passwordHash: { type: String, required: true },
+        password: { type: String, required: true },
 
         isBlocked: { type: Boolean, default: false },
         lastLoginAt: { type: Date },
@@ -46,8 +46,6 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
 userSchema.index({ currentCollege: 1 });
 userSchema.index({ role: 1 });
 
