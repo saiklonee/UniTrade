@@ -115,10 +115,10 @@ export const addItem = async (req, res) => {
         }
 
         // Upload images if provided
-        const imageFiles = req.files?.images || [];
+        const imageFiles = req.files || [];
         console.log("Uploading", imageFiles.length, "images to Cloudinary");
 
-        const imageUrls = [];
+        let imageUrls = [];
         if (imageFiles.length > 0) {
             imageUrls = await uploadMultipleToCloudinary(imageFiles, "unitrade/itemImages");
         }
@@ -421,7 +421,7 @@ export const updateItem = async (req, res) => {
         }
 
         // Handle new image uploads
-        const newImageFiles = req.files?.images || [];
+        const newImageFiles = req.files || [];
         if (newImageFiles.length > 0) {
             const newImageUrls = await uploadMultipleToCloudinary(newImageFiles, "unitrade/items");
             item.imageUrls = [...item.imageUrls, ...newImageUrls];
