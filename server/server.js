@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRouter from "./routes/userRoute.js"
 import collegeRouter from "./routes/collegeRoute.js";
+import itemRouter from "./routes/itemRoute.js";
 import connectDB from "./configs/db.js";
 import connectCloudinary from "./configs/cloudinary.js";
 
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
 // apis
 app.use("/api/user", userRouter)
 app.use("/api/college", collegeRouter)
+app.use("/api/item", itemRouter)
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

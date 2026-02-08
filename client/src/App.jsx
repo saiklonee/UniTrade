@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import CollegeApiTestPage from "./pages/AddCollege";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
+import AddItem from "./pages/AddItem";
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/college" element={<CollegeApiTestPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/add-item" element={<AddItem />} />
       </Routes>
     </div>
   )
