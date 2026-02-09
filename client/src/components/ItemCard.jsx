@@ -30,8 +30,8 @@ const ItemCard = ({ item }) => {
 
     const displayPrice =
         listingType === "sell"
-            ? `${CURRENCY} ${price}`
-            : `${CURRENCY} ${rentPrice} / ${rentUnit}`;
+            ? `${CURRENCY} ${price?.toLocaleString()}`
+            : `${CURRENCY} ${rentPrice?.toLocaleString()} / ${rentUnit}`;
 
     // build wishlist id set safely
     const wishlistIdSet = useMemo(() => {
@@ -65,7 +65,7 @@ const ItemCard = ({ item }) => {
 
         if (res.meta.requestStatus === "fulfilled") {
             toast.success(isInWishlist ? "Removed from wishlist" : "Added to wishlist");
-            dispatch(fetchWishlist()); // simple & consistent
+            dispatch(fetchWishlist());
         } else {
             toast.error(res.payload || "Wishlist action failed");
         }
@@ -73,52 +73,63 @@ const ItemCard = ({ item }) => {
 
     return (
         <div
-            onClick={() => navigate(`/item/${_id}`)}
-            className="group cursor-pointer bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
+            onClick={() => navigate(`/product/${_id}`)}
+            className="group cursor-pointer flex flex-col gap-3"
         >
-            {/* Image */}
-            <div className="relative h-44 bg-slate-100">
+            {/* Image Container */}
+            <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden">
                 {imageUrls?.[0] ? (
                     <img
                         src={imageUrls[0]}
                         alt={title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50 text-sm">
                         No Image
                     </div>
                 )}
 
-                {/* Wishlist */}
+                {/* Wishlist Button: appears on hover */}
                 <button
                     onClick={toggleWishlist}
                     disabled={isUpdating}
-                    className="absolute top-3 right-3 bg-white/90 backdrop-blur p-1.5 rounded-full shadow hover:bg-white disabled:opacity-60 disabled:cursor-not-allowed"
-                    title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                    className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all duration-300 ${isInWishlist
+                            ? "bg-white/90 text-red-500 shadow-sm"
+                            : "bg-black/10 text-white opacity-0 group-hover:opacity-100 hover:bg-black/30"
+                        }`}
                 >
                     <Heart
-                        size={16}
-                        className={isInWishlist ? "text-red-500 fill-red-500" : "text-slate-600"}
+                        size={18}
+                        className={isInWishlist ? "fill-current" : ""}
+                        strokeWidth={isInWishlist ? 0 : 2}
                     />
                 </button>
+
+                {/* Badges */}
+                <div className="absolute top-3 left-3 flex flex-col gap-1">
+                    {listingType === 'rent' && (
+                        <span className="px-2 py-1 bg-white/90 backdrop-blur text-[10px] font-bold uppercase tracking-wider text-black rounded-full shadow-sm">
+                            Rent
+                        </span>
+                    )}
+                    <span className="px-2 py-1 bg-white/90 backdrop-blur text-[10px] font-bold uppercase tracking-wider text-black rounded-full shadow-sm">
+                        {condition}
+                    </span>
+                </div>
             </div>
 
             {/* Content */}
-            <div className="p-4 space-y-2">
-                <h3 className="font-semibold text-slate-900 truncate">{title}</h3>
-
-                <div className="flex items-center justify-between">
-                    <span className="text-indigo-600 font-bold text-sm">{displayPrice}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 capitalize">
-                        {listingType}
-                    </span>
+            <div className="space-y-1">
+                <div className="flex justify-between items-start">
+                    <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        {title}
+                    </h3>
+                    <p className="font-semibold text-gray-900 whitespace-nowrap text-sm">
+                        {displayPrice}
+                    </p>
                 </div>
-
-                <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="capitalize">{condition}</span>
-                    <span className="capitalize">{category}</span>
-                </div>
+                <p className="text-sm text-gray-500 capitalize">{category}</p>
             </div>
         </div>
     );

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { fetchWishlist } from "../redux/features/wishlist/wishlistSlice";
 import ItemCard from "../components/ItemCard";
+import { Heart } from "lucide-react";
 
 const Wishlist = () => {
     const dispatch = useDispatch();
@@ -19,7 +20,8 @@ const Wishlist = () => {
                     ? items.items
                     : [];
 
-        return arr.map((x) => x?.item || x).filter(Boolean);
+        // Filter out nulls and ensure structure
+        return arr.map((x) => x?.item || x).filter(i => i && i._id);
     }, [items]);
 
     useEffect(() => {
@@ -33,62 +35,41 @@ const Wishlist = () => {
 
     if (!user) {
         return (
-            <div className="p-6 bg-white border border-slate-200 rounded-2xl">
-                <h2 className="text-lg font-bold text-slate-900">Wishlist</h2>
-                <p className="text-sm text-slate-500 mt-1">
-                    Please login to see your wishlist.
-                </p>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+                <Heart size={48} className="text-gray-300 mb-4" />
+                <h2 className="text-xl font-bold text-gray-900">Wishlist</h2>
+                <p className="text-gray-500 mt-2">Please login to see your wishlist.</p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-xl font-extrabold text-slate-900">Wishlist</h1>
-                    <p className="text-sm text-slate-500 mt-1">
-                        Items you saved.
-                    </p>
+                    <h1 className="text-3xl font-bold text-gray-900">Your Wishlist</h1>
+                    <p className="text-gray-500 mt-1">{normalizedItems.length} items saved</p>
                 </div>
-
-                <button
-                    onClick={() => dispatch(fetchWishlist())}
-                    disabled={status === "loading"}
-                    className="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {status === "loading" ? "Refreshing..." : "Refresh"}
-                </button>
             </div>
 
-            {/* Body */}
-            {status === "loading" ? (
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-600">
-                    Loading wishlist…
+            {status === "loading" && normalizedItems.length === 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="aspect-[4/3] bg-gray-100 rounded-2xl animate-pulse"></div>
+                    ))}
                 </div>
             ) : normalizedItems.length === 0 ? (
-                <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200">
-                    <div className="text-slate-800 font-semibold">No items in wishlist</div>
-                    <div className="text-slate-500 text-sm mt-1">
-                        Browse your university feed and add items to wishlist.
-                    </div>
+                <div className="text-center py-24 bg-gray-50 rounded-3xl border border-gray-100">
+                    <Heart size={48} className="mx-auto text-gray-300 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900">Your wishlist is empty</h3>
+                    <p className="text-gray-500 mt-2">Browse the feed and save items you like!</p>
                 </div>
             ) : (
-                <>
-                    <div className="text-sm text-slate-500">
-                        Total:{" "}
-                        <span className="font-semibold text-slate-800">
-                            {normalizedItems.length}
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {normalizedItems.map((item) => (
-                            <ItemCard key={item._id} item={item} />
-                        ))}
-                    </div>
-                </>
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 gap-y-10">
+                    {normalizedItems.map((item) => (
+                        <ItemCard key={item._id} item={item} />
+                    ))}
+                </div>
             )}
         </div>
     );

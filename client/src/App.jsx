@@ -15,13 +15,15 @@ import EditProfile from "./pages/profile/EditProfile";
 import ManageItems from "./pages/profile/ManageItems";
 import AddItemPage from "./pages/profile/AddItemPage";
 import Wishlist from "./pages/Wishlist";
+import AllProducts from "./pages/AllProducts";
+import ProductDetails from "./pages/ProductDetails";
 
-// Simple loader (replace with your component if you have one)
+// Simple loader
 const BootLoader = ({ label = "Booting UniTrade..." }) => (
-  <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+  <div className="min-h-screen bg-white text-black flex items-center justify-center">
     <div className="text-center">
-      <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-      <p className="text-slate-300">{label}</p>
+      <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-gray-500 text-sm font-medium tracking-wide">{label}</p>
     </div>
   </div>
 );
@@ -61,7 +63,7 @@ const App = () => {
         element={user ? <Navigate to="/home" replace /> : <Landing />}
       />
 
-      {/* Protected routes */}
+      {/* Public/Protected Layout Routes */}
       <Route
         path="/home"
         element={
@@ -72,6 +74,20 @@ const App = () => {
       >
         <Route index element={<Home />} />
         <Route path="wishlist" element={<Wishlist />} />
+      </Route>
+
+      {/* Product Routes (Wrapped in Public Layout for consistency) */}
+      <Route
+        path="/"
+        element={
+          <Protected user={user}>
+            <PublicLayout />
+          </Protected>
+        }
+      >
+        <Route path="products" element={<AllProducts />} />
+        <Route path="product/:id" element={<ProductDetails />} />
+        <Route path="category/:slug" element={<AllProducts />} />
       </Route>
 
       <Route
@@ -85,7 +101,6 @@ const App = () => {
         <Route index element={<EditProfile />} />
         <Route path="add-item" element={<AddItemPage />} />
         <Route path="manage-items" element={<ManageItems />} />
-        {/* <Route path="wishlist" element={<WishlistPage />} /> */}
       </Route>
 
       <Route

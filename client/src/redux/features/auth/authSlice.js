@@ -35,6 +35,18 @@ export const logout = createAsyncThunk("auth/logout", async (_, { rejectWithValu
     }
 });
 
+export const updateProfile = createAsyncThunk("auth/updateProfile", async (formData, { rejectWithValue }) => {
+    try {
+        const res = await http.patch("/api/user/me", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        if (!res.data?.success) return rejectWithValue(res.data?.message || "Update failed");
+        return res.data.user;
+    } catch (e) {
+        return rejectWithValue(e?.response?.data?.message || e.message);
+    }
+});
+
 const authSlice = createSlice({
     name: "auth",
     initialState: {
@@ -77,6 +89,19 @@ const authSlice = createSlice({
 
         b.addCase(logout.fulfilled, (state) => {
             state.user = null;
+        });
+
+        b.addCase(updateProfile.pending, (state) => {
+            state.status = "loading";
+            state.error = null;
+        });
+        b.addCase(updateProfile.fulfilled, (state, action) => {
+            state.status = "succeeded";
+            state.user = action.payload;
+        });
+        b.addCase(updateProfile.rejected, (state, action) => {
+            state.status = "failed";
+            state.error = action.payload || "Update failed";
         });
     },
 });

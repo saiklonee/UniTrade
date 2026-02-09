@@ -75,33 +75,30 @@ const ProfileLayout = () => {
                             </NavLink>
 
                             <NavLink
-                                to="/profile/wishlist"
+                                to="/home/wishlist"
                                 className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
                             >
                                 ❤️ Wishlist
                             </NavLink>
 
-                            {/* Optional: Admin section */}
-                            {user?.role === "admin" && (
-                                <NavLink
-                                    to="/profile/admin/colleges"
-                                    className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
-                                >
-                                    🏫 Colleges (Admin)
-                                </NavLink>
-                            )}
+                            {/* Optional: Danger Zone */}
+                            {/* <div className="pt-2 mt-2 border-t border-slate-100">
+                                <button className="flex items-center gap-3 px-3 py-2 rounded-xl transition text-sm font-medium text-red-600 hover:bg-red-50 w-full text-left">
+                                    🚪 Logout
+                                </button>
+                            </div> */}
                         </div>
 
                         <div className="mt-4 pt-4 border-t border-slate-200 flex gap-2">
                             <button
                                 onClick={() => navigate("/home")}
-                                className="flex-1 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold"
+                                className="flex-1 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
                             >
                                 Back to Feed
                             </button>
                             <button
                                 onClick={() => navigate("/")}
-                                className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold"
+                                className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
                             >
                                 Home
                             </button>
@@ -109,7 +106,7 @@ const ProfileLayout = () => {
                     </aside>
 
                     {/* Outlet */}
-                    <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6">
+                    <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6 min-h-[500px]">
                         <Outlet />
                     </section>
                 </div>

@@ -61,7 +61,7 @@ export default function MainBanner() {
                         ref={titleRef}
                         className="text-4xl md:text-6xl font-bold text-white leading-tight"
                     >
-                        Discover the Future of Tech
+                        A marketplace of your university
                     </h1>
 
                     <p ref={paraRef} className="text-base md:text-xl text-white/90 max-w-2xl">

@@ -1,7 +1,7 @@
-import AddItem from "../AddItem";
+import ProfileAddItem from "./ProfileAddItem";
 
 const AddItemPage = () => {
-    return <AddItem />;
+    return <ProfileAddItem />;
 };
 
 export default AddItemPage;
