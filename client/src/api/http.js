@@ -2,6 +2,7 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, ""); // remove trailing slash
 
+
 export const http = axios.create({
     baseURL,
     withCredentials: true, // because auth uses cookie token

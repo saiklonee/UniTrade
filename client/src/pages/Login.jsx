@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import axios from "axios";
+import { http } from "../api/http";
 
 const ROLES = [
     { value: "student", label: "Student" },
@@ -7,56 +7,52 @@ const ROLES = [
 ];
 
 const InputField = React.memo(
-    ({ label, type, value, onChange, placeholder, disabled, className = "" }) => {
-        return (
-            <div className="space-y-1">
-                <label className="text-xs text-slate-300">{label}</label>
-                <input
-                    type={type}
-                    value={value}
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className={`w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none
-          focus:border-indigo-500/40 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 ${className}`}
-                />
-            </div>
-        );
-    }
+    ({ label, type, value, onChange, placeholder, disabled, className = "" }) => (
+        <div className="space-y-1">
+            <label className="text-xs text-slate-300">{label}</label>
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                disabled={disabled}
+                className={`w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none
+        focus:border-indigo-500/40 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 ${className}`}
+            />
+        </div>
+    )
 );
 
 const SelectField = React.memo(
-    ({ label, value, onChange, options, disabled, loading, loadingText, className = "" }) => {
-        return (
-            <div className="space-y-1">
-                <label className="text-xs text-slate-300">{label}</label>
-                <select
-                    value={value}
-                    onChange={onChange}
-                    disabled={disabled || loading}
-                    className={`w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none
-          focus:border-indigo-500/40 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 ${className}`}
-                >
-                    {loading ? (
+    ({ label, value, onChange, options, disabled, loading, loadingText, className = "" }) => (
+        <div className="space-y-1">
+            <label className="text-xs text-slate-300">{label}</label>
+            <select
+                value={value}
+                onChange={onChange}
+                disabled={disabled || loading}
+                className={`w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-white outline-none
+        focus:border-indigo-500/40 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60 ${className}`}
+            >
+                {loading ? (
+                    <option value="" className="bg-slate-950">
+                        {loadingText || "Loading..."}
+                    </option>
+                ) : (
+                    <>
                         <option value="" className="bg-slate-950">
-                            {loadingText || "Loading..."}
+                            Select...
                         </option>
-                    ) : (
-                        <>
-                            <option value="" className="bg-slate-950">
-                                Select...
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value} className="bg-slate-950">
+                                {option.label}
                             </option>
-                            {options.map((option) => (
-                                <option key={option.value} value={option.value} className="bg-slate-950">
-                                    {option.label}
-                                </option>
-                            ))}
-                        </>
-                    )}
-                </select>
-            </div>
-        );
-    }
+                        ))}
+                    </>
+                )}
+            </select>
+        </div>
+    )
 );
 
 const ErrorMessage = React.memo(({ message, type = "error" }) => {
@@ -69,35 +65,29 @@ const ErrorMessage = React.memo(({ message, type = "error" }) => {
                 ? "bg-amber-500/10 border-amber-500/30 text-amber-200"
                 : "bg-blue-500/10 border-blue-500/30 text-blue-200";
 
-    return (
-        <div className={`mt-4 rounded-xl border ${styles} px-4 py-3 text-sm`}>
-            {message}
-        </div>
-    );
+    return <div className={`mt-4 rounded-xl border ${styles} px-4 py-3 text-sm`}>{message}</div>;
 });
 
-const ModeSwitch = React.memo(({ mode, onChange }) => {
-    return (
-        <div className="flex items-center rounded-full border border-white/10 bg-white/[0.06] p-1 backdrop-blur-xl">
-            <button
-                type="button"
-                onClick={() => onChange("signin")}
-                className={`px-3 py-1.5 text-sm rounded-full transition
-        ${mode === "signin" ? "bg-white/10 text-white" : "text-slate-300 hover:text-white"}`}
-            >
-                Sign in
-            </button>
-            <button
-                type="button"
-                onClick={() => onChange("signup")}
-                className={`px-3 py-1.5 text-sm rounded-full transition
-        ${mode === "signup" ? "bg-white/10 text-white" : "text-slate-300 hover:text-white"}`}
-            >
-                Sign up
-            </button>
-        </div>
-    );
-});
+const ModeSwitch = React.memo(({ mode, onChange }) => (
+    <div className="flex items-center rounded-full border border-white/10 bg-white/[0.06] p-1 backdrop-blur-xl">
+        <button
+            type="button"
+            onClick={() => onChange("signin")}
+            className={`px-3 py-1.5 text-sm rounded-full transition
+      ${mode === "signin" ? "bg-white/10 text-white" : "text-slate-300 hover:text-white"}`}
+        >
+            Sign in
+        </button>
+        <button
+            type="button"
+            onClick={() => onChange("signup")}
+            className={`px-3 py-1.5 text-sm rounded-full transition
+      ${mode === "signup" ? "bg-white/10 text-white" : "text-slate-300 hover:text-white"}`}
+        >
+            Sign up
+        </button>
+    </div>
+));
 
 const FilePill = React.memo(({ filename }) => {
     if (!filename) return null;
@@ -143,7 +133,8 @@ export default function Login() {
                 setLoadingColleges(true);
                 setCollegesError("");
 
-                const res = await axios.get("http://localhost:4000/api/college/list");
+                const res = await http.get("/api/college/list");
+
                 if (res.data?.success) {
                     const list = res.data.colleges || [];
                     setColleges(
@@ -157,7 +148,7 @@ export default function Login() {
                 }
             } catch (err) {
                 console.error("Error fetching colleges:", err);
-                setCollegesError("Failed to load colleges. Make sure backend is running.");
+                setCollegesError(err?.response?.data?.message || "Failed to load colleges.");
             } finally {
                 setLoadingColleges(false);
             }
@@ -166,9 +157,7 @@ export default function Login() {
         fetchColleges();
     }, []);
 
-    const canSubmitSignin = useMemo(() => {
-        return signin.email.trim() && signin.password.trim();
-    }, [signin]);
+    const canSubmitSignin = useMemo(() => signin.email.trim() && signin.password.trim(), [signin]);
 
     const canSubmitSignup = useMemo(() => {
         const basicFields =
@@ -184,16 +173,12 @@ export default function Login() {
     }, [signup]);
 
     const handleSigninChange = useCallback(
-        (field) => (e) => {
-            setSignin((prev) => ({ ...prev, [field]: e.target.value }));
-        },
+        (field) => (e) => setSignin((prev) => ({ ...prev, [field]: e.target.value })),
         []
     );
 
     const handleSignupChange = useCallback(
-        (field) => (e) => {
-            setSignup((prev) => ({ ...prev, [field]: e.target.value }));
-        },
+        (field) => (e) => setSignup((prev) => ({ ...prev, [field]: e.target.value })),
         []
     );
 
@@ -232,7 +217,6 @@ export default function Login() {
         formData.append("password", signup.password);
         formData.append("role", signup.role);
         formData.append("permanentCollege", signup.permanentCollege);
-
         if (avatarFile) formData.append("avatar", avatarFile);
         return formData;
     }, [signup, avatarFile]);
@@ -248,11 +232,12 @@ export default function Login() {
 
         try {
             setSubmitting(true);
-            const res = await axios.post(
-                "http://localhost:4000/api/user/login",
-                { email: signin.email.trim().toLowerCase(), password: signin.password },
-                { withCredentials: true }
-            );
+
+            // ✅ use shared http client
+            const res = await http.post("/api/user/login", {
+                email: signin.email.trim().toLowerCase(),
+                password: signin.password,
+            });
 
             if (!res.data?.success) {
                 setError(res.data?.message || "Login failed.");
@@ -287,8 +272,8 @@ export default function Login() {
             setSubmitting(true);
             const formData = buildSignupFormData();
 
-            const res = await axios.post("http://localhost:4000/api/user/register", formData, {
-                withCredentials: true,
+            // ✅ use shared http client
+            const res = await http.post("/api/user/register", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
@@ -308,7 +293,7 @@ export default function Login() {
             } else if (err.code === "ERR_NETWORK") {
                 setError("Cannot connect to server. Make sure backend is running.");
             } else {
-                setError("Signup failed. Please try again.");
+                setError(err?.response?.data?.message || "Signup failed. Please try again.");
             }
         } finally {
             setSubmitting(false);
@@ -317,40 +302,30 @@ export default function Login() {
 
     return (
         <div className="min-h-screen bg-black text-slate-100 relative overflow-hidden">
-            {/* Background glow */}
             <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[520px] w-[520px] rounded-full bg-indigo-600/20 blur-3xl" />
             <div className="pointer-events-none absolute bottom-[-220px] right-[-180px] h-[520px] w-[520px] rounded-full bg-fuchsia-600/10 blur-3xl" />
 
             <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
                 <div className="w-full max-w-md">
-                    {/* Card */}
                     <div className="rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl shadow-[0_20px_70px_rgba(0,0,0,0.55)] overflow-hidden">
-
                         <div className="p-6 sm:p-7">
-                            {/* Header */}
                             <div className="flex items-start justify-between gap-3">
                                 <div>
-                                    <p className="text-xs text-white/60">
-                                        Secure • College-only • Verified
-                                    </p>
+                                    <p className="text-xs text-white/60">Secure • College-only • Verified</p>
                                     <h1 className="mt-1 text-xl font-semibold tracking-tight text-white">
                                         {mode === "signin" ? "Welcome back" : "Create your account"}
                                     </h1>
                                     <p className="text-sm text-slate-300 mt-1">
-                                        {mode === "signin"
-                                            ? "Sign in to continue."
-                                            : "Sign up as Student or Faculty."}
+                                        {mode === "signin" ? "Sign in to continue." : "Sign up as Student or Faculty."}
                                     </p>
                                 </div>
 
                                 <ModeSwitch mode={mode} onChange={switchMode} />
                             </div>
 
-                            {/* Errors */}
                             <ErrorMessage message={error} type="error" />
                             <ErrorMessage message={collegesError} type="warning" />
 
-                            {/* Forms */}
                             {mode === "signin" ? (
                                 <form onSubmit={handleSignin} className="mt-6 space-y-4">
                                     <InputField
@@ -472,9 +447,7 @@ export default function Login() {
                         hover:file:bg-white/15
                       "
                                         />
-                                        <p className="text-[11px] text-slate-400">
-                                            Max 5MB • JPEG / PNG / GIF / WebP
-                                        </p>
+                                        <p className="text-[11px] text-slate-400">Max 5MB • JPEG / PNG / GIF / WebP</p>
                                         <FilePill filename={avatarFile?.name} />
                                     </div>
 
@@ -507,7 +480,6 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Footer */}
                     <p className="mt-5 text-center text-xs text-white/40">
                         By continuing, you agree to your college platform rules.
                     </p>
