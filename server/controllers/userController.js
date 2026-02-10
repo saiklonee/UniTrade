@@ -19,7 +19,7 @@ const setAuthCookie = (res, token) => {
     res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 };
@@ -190,37 +190,12 @@ export const login = async (req, res) => {
 
 // GET /api/user/is-auth
 export const isAuth = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id)
-            .populate("permanentCollege", "name code")
-            .populate("currentCollege", "name code");
-
-        if (!user) {
-            return res.status(401).json({
-                success: false,
-                message: "Not authenticated"
-            });
-        }
-
-        if (user.isBlocked) {
-            return res.status(403).json({
-                success: false,
-                message: "Account is blocked"
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            user: safeUser(user)
-        });
-    } catch (error) {
-        console.error("IsAuth error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error"
-        });
-    }
+    return res.status(200).json({
+        success: true,
+        user: safeUser(req.user),
+    });
 };
+
 
 // POST /api/user/logout
 export const logout = async (req, res) => {
