@@ -29,17 +29,14 @@ const allowedOrigins = [
 //Middle Ware Configuration
 app.use(express.json());
 app.use(cookieParser());
+
+
 app.use(
     cors({
-        origin: function (origin, callback) {
-            // allow requests with no origin (like Postman)
-            if (!origin) return callback(null, true);
-
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
-
-            return callback(new Error("CORS blocked for origin: " + origin));
+        origin: (origin, cb) => {
+            if (!origin) return cb(null, true);
+            if (allowedOrigins.includes(origin)) return cb(null, true);
+            return cb(new Error("CORS blocked: " + origin));
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -47,8 +44,10 @@ app.use(
     })
 );
 
-// handle preflight
-app.options("*", cors());
+// ✅ OPTIONAL (only if you still face preflight issues)
+app.options(/.*/, cors());
+
+
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
