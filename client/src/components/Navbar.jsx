@@ -112,7 +112,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-8">
             <NavLink to="/home" className={navLinkClass}>Feed</NavLink>
             <NavLink to="/products" className={navLinkClass}>Browse</NavLink>
-            <NavLink to="/wishlist" className={navLinkClass}>Wishlist</NavLink>
+            <NavLink to="/home/wishlist" className={navLinkClass}>Wishlist</NavLink>
 
             {user && (
               <NavLink to="/add-item" className={navLinkClass}>Sell</NavLink>
