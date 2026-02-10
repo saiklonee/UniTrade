@@ -13,6 +13,9 @@ import wishlistRouter from "./routes/wishlistRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
+app.set("trust proxy", 1); // ✅ important for secure cookies behind Vercel/Proxies
+
+
 await connectDB();
 await connectCloudinary();
 
