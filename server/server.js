@@ -13,9 +13,6 @@ import wishlistRouter from "./routes/wishlistRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-app.set("trust proxy", 1); // ✅ important for secure cookies behind Vercel/Proxies
-
-
 await connectDB();
 await connectCloudinary();
 
@@ -29,24 +26,12 @@ const allowedOrigins = [
 //Middle Ware Configuration
 app.use(express.json());
 app.use(cookieParser());
-
-
 app.use(
     cors({
-        origin: (origin, cb) => {
-            if (!origin) return cb(null, true);
-            if (allowedOrigins.includes(origin)) return cb(null, true);
-            return cb(new Error("CORS blocked: " + origin));
-        },
+        origin: allowedOrigins,
         credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
-
-// ✅ OPTIONAL (only if you still face preflight issues)
-app.options(/.*/, cors());
-
 
 app.get("/", (req, res) => {
     res.send("Hello World");
