@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { http } from "../../api/http";
 
 const CATEGORIES = [
     { value: "books", label: "Books" },
@@ -42,7 +42,6 @@ const ProfileAddItem = () => {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
-    // Form state
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -56,40 +55,33 @@ const ProfileAddItem = () => {
         tags: "",
     });
 
-    // Image state
     const [images, setImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleImageChange = (e) => {
-        const files = Array.from(e.target.files);
+        const files = Array.from(e.target.files || []);
 
-        // Validate number of images
         if (images.length + files.length > 5) {
             setError("Maximum 5 images allowed");
             e.target.value = "";
             return;
         }
 
-        // Validate file types and sizes
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+
         const validFiles = [];
 
-        files.forEach(file => {
-            // Check file type
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        files.forEach((file) => {
             if (!allowedTypes.includes(file.type)) {
                 setError(`Invalid file type: ${file.name}. Only images are allowed.`);
                 return;
             }
 
-            // Check file size (5MB)
             if (file.size > 5 * 1024 * 1024) {
                 setError(`File too large: ${file.name}. Maximum size is 5MB.`);
                 return;
@@ -97,16 +89,15 @@ const ProfileAddItem = () => {
 
             validFiles.push(file);
 
-            // Create preview
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreviews(prev => [...prev, reader.result]);
+                setImagePreviews((prev) => [...prev, reader.result]);
             };
             reader.readAsDataURL(file);
         });
 
         if (validFiles.length > 0) {
-            setImages(prev => [...prev, ...validFiles]);
+            setImages((prev) => [...prev, ...validFiles]);
             setError("");
         }
 
@@ -114,8 +105,8 @@ const ProfileAddItem = () => {
     };
 
     const removeImage = (index) => {
-        setImages(prev => prev.filter((_, i) => i !== index));
-        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+        setImages((prev) => prev.filter((_, i) => i !== index));
+        setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     };
 
     const validateForm = () => {
@@ -155,7 +146,6 @@ const ProfileAddItem = () => {
 
         if (!validateForm()) return;
 
-        // Check if user college is set
         if (!user?.currentCollege) {
             setError("You need to select a college in your profile first");
             return;
@@ -164,10 +154,8 @@ const ProfileAddItem = () => {
         setLoading(true);
 
         try {
-            // Create FormData
             const data = new FormData();
 
-            // Append form fields
             data.append("title", formData.title.trim());
             data.append("description", formData.description.trim());
             data.append("category", formData.category);
@@ -186,31 +174,20 @@ const ProfileAddItem = () => {
                 data.append("tags", formData.tags.trim());
             }
 
-            // Append images
-            images.forEach((image) => {
-                data.append("images", image);
+            images.forEach((image) => data.append("images", image));
+
+            // ✅ use shared http instance
+            const response = await http.post("/api/item/add", data, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            // Make API call
-            const response = await axios.post(
-                "http://localhost:4000/api/item/add",
-                data,
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            if (response.data.success) {
+            if (response.data?.success) {
                 setSuccess("Item listed successfully!");
-                // Redirect to manage items
                 setTimeout(() => {
                     navigate("/profile/manage-items");
-                }, 1500);
+                }, 1200);
             } else {
-                setError(response.data.message || "Failed to list item");
+                setError(response.data?.message || "Failed to list item");
             }
         } catch (err) {
             setError(
@@ -226,7 +203,9 @@ const ProfileAddItem = () => {
     if (!user?.currentCollege) {
         return (
             <div className="text-center py-10">
-                <p className="text-slate-600 mb-4">Please update your profile with your current college to start listing items.</p>
+                <p className="text-slate-600 mb-4">
+                    Please update your profile with your current college to start listing items.
+                </p>
                 <button
                     onClick={() => navigate("/profile")}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -260,7 +239,9 @@ const ProfileAddItem = () => {
                 {/* Basic Info */}
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            Title
+                        </label>
                         <input
                             type="text"
                             name="title"
@@ -274,7 +255,9 @@ const ProfileAddItem = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            Description
+                        </label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -288,31 +271,46 @@ const ProfileAddItem = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Category
+                            </label>
                             <select
                                 name="category"
                                 value={formData.category}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
                             >
-                                {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                {CATEGORIES.map((c) => (
+                                    <option key={c.value} value={c.value}>
+                                        {c.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
+
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Condition</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Condition
+                            </label>
                             <select
                                 name="condition"
                                 value={formData.condition}
                                 onChange={handleInputChange}
                                 className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
                             >
-                                {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                {CONDITIONS.map((c) => (
+                                    <option key={c.value} value={c.value}>
+                                        {c.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Tags (comma separated)</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            Tags (comma separated)
+                        </label>
                         <input
                             type="text"
                             name="tags"
@@ -329,16 +327,18 @@ const ProfileAddItem = () => {
                     <h3 className="font-semibold text-slate-900">Pricing & Type</h3>
 
                     <div className="flex gap-2">
-                        {LISTING_TYPES.map(type => (
+                        {LISTING_TYPES.map((type) => (
                             <button
                                 key={type.value}
                                 type="button"
-                                onClick={() => setFormData(prev => ({
-                                    ...prev,
-                                    listingType: type.value,
-                                    price: type.value === "sell" ? prev.price : "",
-                                    rentPrice: type.value === "rent" ? prev.rentPrice : ""
-                                }))}
+                                onClick={() =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        listingType: type.value,
+                                        price: type.value === "sell" ? prev.price : "",
+                                        rentPrice: type.value === "rent" ? prev.rentPrice : "",
+                                    }))
+                                }
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${formData.listingType === type.value
                                     ? "bg-indigo-600 text-white"
                                     : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-100"
@@ -351,7 +351,9 @@ const ProfileAddItem = () => {
 
                     {formData.listingType === "sell" ? (
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (₹)</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">
+                                Price (₹)
+                            </label>
                             <input
                                 type="number"
                                 name="price"
@@ -365,7 +367,9 @@ const ProfileAddItem = () => {
                     ) : (
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Rent Price (₹)</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Rent Price (₹)
+                                </label>
                                 <input
                                     type="number"
                                     name="rentPrice"
@@ -376,15 +380,22 @@ const ProfileAddItem = () => {
                                     min="0"
                                 />
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Per</label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">
+                                    Per
+                                </label>
                                 <select
                                     name="rentUnit"
                                     value={formData.rentUnit}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
                                 >
-                                    {RENT_UNITS.map(u => <option key={u.value} value={u.value}>{u.label}</option>)}
+                                    {RENT_UNITS.map((u) => (
+                                        <option key={u.value} value={u.value}>
+                                            {u.label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -393,11 +404,16 @@ const ProfileAddItem = () => {
 
                 {/* Images */}
                 <div className="space-y-4">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Images (Min 1, Max 5)</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Images (Min 1, Max 5)
+                    </label>
 
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
                         {imagePreviews.map((src, i) => (
-                            <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200">
+                            <div
+                                key={i}
+                                className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200"
+                            >
                                 <img src={src} alt="" className="w-full h-full object-cover" />
                                 <button
                                     type="button"
@@ -434,7 +450,6 @@ const ProfileAddItem = () => {
                         {loading ? "Listing..." : "Post Item"}
                     </button>
                 </div>
-
             </form>
         </div>
     );
