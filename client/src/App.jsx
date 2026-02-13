@@ -17,6 +17,7 @@ import AddItemPage from "./pages/profile/AddItemPage";
 import Wishlist from "./pages/Wishlist";
 import AllProducts from "./pages/AllProducts";
 import ProductDetails from "./pages/ProductDetails";
+import AdminDashboardLayout from "./layout/AdminDashboardLayout";
 
 // Simple loader
 const BootLoader = ({ label = "Booting UniTrade..." }) => (
@@ -101,6 +102,12 @@ const App = () => {
         <Route index element={<EditProfile />} />
         <Route path="add-item" element={<AddItemPage />} />
         <Route path="manage-items" element={<ManageItems />} />
+      </Route>
+
+      <Route
+        path="/admin"
+      >
+        <Route index element={<AdminDashboardLayout />} />
       </Route>
 
       <Route

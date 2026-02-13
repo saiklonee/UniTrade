@@ -28,7 +28,16 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+            // allow requests with no origin (Postman, server-to-server)
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, origin); // 👈 echo the same origin back
+            }
+
+            return callback(new Error(`CORS blocked for origin: ${origin}`));
+        },
         credentials: true,
     })
 );
