@@ -19,10 +19,10 @@ const AdminDashboardLayout = () => {
     const idle = "text-slate-700 hover:bg-slate-100";
     return (
         <div className="h-screen w-full bg-slate-50">
-            <div className="max-w-6xl mx-auto px-4 md:px-6 py-6">
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+            <div className="max-w-full h-full mx-auto px-4 md:px-6 py-6">
+                <div className="grid h-full grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
                     {/* Sidebar */}
-                    <aside className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 h-fit sticky top-24">
+                    <aside className="bg-white h-full border border-slate-200 rounded-2xl shadow-sm p-4 sticky">
                         {/* User card */}
                         <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
                             <div className="w-11 h-11 rounded-full overflow-hidden bg-white border border-slate-200 flex items-center justify-center">
@@ -50,7 +50,7 @@ const AdminDashboardLayout = () => {
                         </div>
 
                         {/* Nav */}
-                        <div className="mt-4 grid gap-2">
+                        <div className="mt-4 w-full grid gap-2">
                             <NavLink
                                 to="/profile"
                                 end
@@ -88,7 +88,7 @@ const AdminDashboardLayout = () => {
                             </div> */}
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-slate-200 flex gap-2">
+                        <div className="mt-4 pt-4 sticky bottom-4 w-full border-t border-slate-200 flex gap-2">
                             <button
                                 onClick={() => navigate("/home")}
                                 className="flex-1 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
