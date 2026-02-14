@@ -18,6 +18,8 @@ import Wishlist from "./pages/Wishlist";
 import AllProducts from "./pages/AllProducts";
 import ProductDetails from "./pages/ProductDetails";
 import AdminDashboardLayout from "./layout/AdminDashboardLayout";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminItems from "./pages/admin/AdminItems";
 
 // Simple loader
 const BootLoader = ({ label = "Booting UniTrade..." }) => (
@@ -106,8 +108,15 @@ const App = () => {
 
       <Route
         path="/admin"
+        element={
+          <Protected user={user}>
+            <AdminDashboardLayout />
+          </Protected>
+        }
       >
-        <Route index element={<AdminDashboardLayout />} />
+        {/* <Route index element={<AdminDashboardLayout />} /> */}
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="items" element={<AdminItems />} />
       </Route>
 
       <Route
