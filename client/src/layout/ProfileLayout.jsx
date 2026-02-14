@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FiEdit3, FiPlusCircle, FiBox, FiHeart, FiArrowLeft, FiHome } from "react-icons/fi";
 
 const ProfileLayout = () => {
     const navigate = useNavigate();
@@ -23,7 +24,7 @@ const ProfileLayout = () => {
             <div className="max-w-full h-full mx-auto px-4 md:px-6 py-6">
                 <div className="grid h-full grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
                     {/* Sidebar */}
-                    <aside className="bg-white h-full border border-slate-200 rounded-2xl shadow-sm p-4 sticky">
+                    <aside className="bg-white h-full border border-slate-200 rounded-2xl shadow-sm p-4">
                         {/* User card */}
                         <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
                             <div className="w-11 h-11 rounded-full overflow-hidden bg-white border border-slate-200 flex items-center justify-center">
@@ -39,6 +40,7 @@ const ProfileLayout = () => {
                                     </span>
                                 )}
                             </div>
+
                             <div className="min-w-0">
                                 <div className="text-sm font-bold text-slate-900 truncate">
                                     {user?.name || user?.username || "User"}
@@ -57,56 +59,57 @@ const ProfileLayout = () => {
                                 end
                                 className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
                             >
-                                ✏️ Edit Profile
+                                <FiEdit3 className="text-base" />
+                                Edit Profile
                             </NavLink>
 
                             <NavLink
                                 to="/profile/add-item"
                                 className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
                             >
-                                ➕ Add Item
+                                <FiPlusCircle className="text-base" />
+                                Add Item
                             </NavLink>
 
                             <NavLink
                                 to="/profile/manage-items"
                                 className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
                             >
-                                📦 Manage Items
+                                <FiBox className="text-base" />
+                                Manage Items
                             </NavLink>
 
                             <NavLink
                                 to="/home/wishlist"
                                 className={({ isActive }) => `${linkBase} ${isActive ? active : idle}`}
                             >
-                                ❤️ Wishlist
+                                <FiHeart className="text-base" />
+                                Wishlist
                             </NavLink>
-
-                            {/* Optional: Danger Zone */}
-                            {/* <div className="pt-2 mt-2 border-t border-slate-100">
-                                <button className="flex items-center gap-3 px-3 py-2 rounded-xl transition text-sm font-medium text-red-600 hover:bg-red-50 w-full text-left">
-                                    🚪 Logout
-                                </button>
-                            </div> */}
                         </div>
 
+                        {/* Footer buttons */}
                         <div className="mt-4 pt-4 border-t border-slate-200 flex gap-2">
                             <button
                                 onClick={() => navigate("/home")}
-                                className="flex-1 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
+                                className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
                             >
+                                <FiArrowLeft className="text-base" />
                                 Back to Feed
                             </button>
+
                             <button
                                 onClick={() => navigate("/")}
-                                className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
+                                className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-sm font-semibold transition"
                             >
+                                <FiHome className="text-base" />
                                 Home
                             </button>
                         </div>
                     </aside>
 
                     {/* Outlet */}
-                    <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6 min-h-[500px]">
+                    <section className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6 min-h-[500px] overflow-auto">
                         <Outlet />
                     </section>
                 </div>
